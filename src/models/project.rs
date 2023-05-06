@@ -1,55 +1,89 @@
-use super::collection::Collection;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
+use crate::{
+    enums::storage_type::StorageType,
+    errors::project_error::ProjectError,
+    utils::structures::tree::{Node, Tree},
+};
+
+use super::{
+    collection::Collection,
+    project_node::{IdentifiableProjectNode, ProjectNode},
+};
+
+#[derive(Deserialize, Serialize)]
 pub struct Project {
+    id: String,
     name: String,
-    collections: Vec<Collection>,
+    nodes: Tree<ProjectNode>,
+    storage_type: StorageType,
+}
+
+impl Default for Project {
+    fn default() -> Self {
+        Project {
+            id: Uuid::new_v4().to_string(),
+            name: String::from(""),
+            nodes: Tree::new(ProjectNode::Collection(Collection::new("root"))),
+            storage_type: StorageType::Local,
+        }
+    }
 }
 
 impl Project {
-    pub fn new(name: &str) -> Project {
+    pub fn new(name: &str) -> Self {
         Project {
             name: name.to_string(),
-            collections: Vec::new(),
+            nodes: Tree::new(ProjectNode::Collection(Collection::new(name))),
+            ..Project::default()
         }
+    }
+
+    pub fn new_with_id(id: &str, name: &str) -> Self {
+        Project {
+            id: id.to_owned(),
+            name: name.to_owned(),
+            ..Project::default()
+        }
+    }
+
+    pub fn id(&self) -> &str {
+        &self.id
     }
 
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn collections(&self) -> &Vec<Collection> {
-        &self.collections
-    }
-
-    pub fn add_collection(&mut self, collection: &Collection) -> Result<(), String> {
-        if self.is_collection_name_free(&collection.name) {
-            self.collections.push(collection.clone());
-
-            Ok(())
-        } else {
-            Err("Collection with name ".to_string()
-                + &collection.name
-                + " already exists in this project")
+    pub fn root_collection(&self) -> &Collection {
+        match self.nodes.root().data() {
+            ProjectNode::Collection(collection) => return collection,
+            ProjectNode::Request(_) => panic!(),
         }
     }
 
-    pub fn remove_collection(&mut self, collection_name: &str) -> () {
-        if let Some(index) = self
-            .collections
-            .iter()
-            .position(|c| c.name == collection_name)
-        {
-            self.collections.remove(index);
-        }
+    // pub fn find_collection() -> &Collection {}
+
+    pub fn add_to_collection(
+        &mut self,
+        collection: &Collection,
+        node: ProjectNode,
+    ) -> Result<(), ProjectError> {
+        let collection_node = self.find_collection_node_mut(collection);
+
+        match collection_node {
+            Some(collection_node) => collection_node.add_child(node),
+            None => return Err(ProjectError::FindCollectionError),
+        };
+
+        Ok(())
     }
 
-    fn is_collection_name_free(&self, name: &str) -> bool {
-        for collection in &self.collections {
-            if collection.name == name {
-                return false;
-            }
-        }
-
-        true
+    fn find_collection_node_mut(
+        &mut self,
+        collection: &Collection,
+    ) -> Option<&mut Node<ProjectNode>> {
+        self.nodes.find_mut(|n| n.id() == collection.id())
     }
 }

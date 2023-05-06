@@ -1,5 +1,8 @@
 use std::{collections::HashMap, u8};
 
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
 use crate::{
     enums::{headers::ContentType, method::Method},
     http::http_header_mapper::HttpHeaderMapper,
@@ -7,8 +10,10 @@ use crate::{
 
 use super::header::Header;
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Request {
+    id: String,
+    name: String,
     pub uri: String,
     pub headers: HashMap<String, Header>,
     pub method: Method,
@@ -18,11 +23,21 @@ pub struct Request {
 impl Request {
     pub fn new(method: Method, uri: String) -> Request {
         Request {
+            id: Uuid::new_v4().to_string(),
+            name: String::new(),
             uri,
             method,
             headers: HashMap::new(),
             body: Vec::new(),
         }
+    }
+
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
     }
 
     pub fn add_body(&mut self, body: &str) -> &mut Request {
