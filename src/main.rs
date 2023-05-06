@@ -1,30 +1,33 @@
-pub mod enums;
-pub mod http;
-pub mod models;
-pub mod parsers;
-pub mod storage;
-pub mod views;
+#![allow(dead_code, unused_variables)]
 
-use std::env;
+mod enums;
+mod errors;
+mod http;
+mod models;
+mod parsers;
+mod services;
+mod storage;
+mod utils;
+mod views;
 
-use parsers::command::command_parser::CommandParser;
-use views::cli::commands::use_command::UseCommand;
+use std::{env, rc::Rc};
+
+use views::cli::cli_view::CliView;
+
+use crate::{
+    parsers::command::command_parser::CommandParser, views::cli::commands::use_command::UseCommand,
+};
 
 fn main() {
     let mut args: Vec<String> = env::args().collect();
-    let command_parser = CommandParser::new(vec![Box::new(UseCommand::new())]);
+
+    args.remove(0);
 
     if args.len() > 1 {
-        args.remove(0);
+        let use_command = UseCommand::new();
+        let command_parser = CommandParser::new(vec![Box::new(use_command)]);
 
-        match command_parser.parse(args) {
-            Some((command_handler, arguments_map)) => command_handler.handle_command(arguments_map),
-            None => {
-                eprintln!("Command not found");
-
-                std::process::exit(1);
-            }
-        }
+        CliView::new(Rc::new(command_parser)).process_arguments(args);
     } else {
         println!("<GUI View>");
     }
