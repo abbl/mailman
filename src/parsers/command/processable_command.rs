@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, LinkedList},
-    error::Error,
-};
+use std::collections::{HashMap, LinkedList};
 
 use super::{command::Command, command_type::CommandType};
 

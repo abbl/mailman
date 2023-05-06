@@ -11,7 +11,7 @@ impl CommandParser {
     pub fn new(commands_handlers: Vec<Box<dyn CommandHandler>>) -> CommandParser {
         let mut parser = CommandParser { commands_handlers };
 
-        parser.commands_handlers = CommandParser::sort_commands(&mut parser.commands_handlers);
+        parser.commands_handlers = CommandParser::sort_commands(parser.commands_handlers);
 
         parser
     }
@@ -34,8 +34,10 @@ impl CommandParser {
         None
     }
 
-    fn sort_commands(commands: &mut Vec<Box<dyn CommandHandler>>) -> Vec<Box<dyn CommandHandler>> {
+    fn sort_commands(commands: Vec<Box<dyn CommandHandler>>) -> Vec<Box<dyn CommandHandler>> {
+        let mut unsorted_commands = commands;
         let mut sorted_commands: Vec<Box<dyn CommandHandler>> = Vec::new();
+
         let sorting_order = [
             CommandType::Navigation,
             CommandType::Optional,
@@ -43,32 +45,24 @@ impl CommandParser {
         ];
 
         for command_type in sorting_order {
-            sorted_commands
-                .append(CommandParser::extract_commands_by_type(commands, command_type).as_mut());
+            let (mut extracted_commands, remaining_commands) =
+                Self::extract_commands_by_type(unsorted_commands, command_type);
+
+            unsorted_commands = remaining_commands;
+            sorted_commands.append(extracted_commands.as_mut());
         }
 
         sorted_commands
     }
 
     fn extract_commands_by_type(
-        source: &mut Vec<Box<dyn CommandHandler>>,
+        source: Vec<Box<dyn CommandHandler>>,
         command_type: CommandType,
-    ) -> Vec<Box<dyn CommandHandler>> {
-        let mut extracted_commands: Vec<Box<dyn CommandHandler>> = Vec::new();
-        let mut indexes: Vec<usize> = Vec::new();
+    ) -> (Vec<Box<dyn CommandHandler>>, Vec<Box<dyn CommandHandler>>) {
+        let (extracted_commands, remaining_commands) = source
+            .into_iter()
+            .partition(|c| c.processable_command().command_type() == &command_type);
 
-        for (index, command_handler) in source.iter().enumerate() {
-            if command_handler.processable_command().command_type() == &command_type {
-                indexes.push(index);
-            }
-        }
-
-        for index in indexes {
-            let command = source.remove(index);
-
-            extracted_commands.push(command);
-        }
-
-        extracted_commands
+        (extracted_commands, remaining_commands)
     }
 }
