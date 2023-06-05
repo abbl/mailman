@@ -4,7 +4,6 @@ use std::{error::Error, fmt::Display};
 pub enum WorkspaceError {
     ProjectNotSelected,
     CollectionNotSelected,
-    WorkspaceNotFound,
     ProjectsNotFound,
     ProjectNotFound,
 }
@@ -18,7 +17,6 @@ impl Display for WorkspaceError {
             WorkspaceError::CollectionNotSelected => {
                 write!(f, "Collection has to be selected to perform this action.")
             }
-            WorkspaceError::WorkspaceNotFound => write!(f, "Workspace not found."),
             WorkspaceError::ProjectsNotFound => write!(f, "Workspace has no projects."),
             WorkspaceError::ProjectNotFound => write!(f, "Workspace contains no such project."),
         }
@@ -26,3 +24,18 @@ impl Display for WorkspaceError {
 }
 
 impl Error for WorkspaceError {}
+
+#[derive(Debug)]
+pub enum LoadWorkspaceError {
+    WorkspaceNotFound,
+}
+
+impl Display for LoadWorkspaceError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LoadWorkspaceError::WorkspaceNotFound => write!(f, "Workspace not found."),
+        }
+    }
+}
+
+impl Error for LoadWorkspaceError {}

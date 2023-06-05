@@ -8,6 +8,8 @@ use super::{collection::Collection, project::Project};
 pub struct Workspace {
     project_id: Option<String>,
     collection_id: Option<String>,
+
+    #[serde(skip_serializing)]
     projects: Vec<Project>,
 }
 
@@ -26,19 +28,26 @@ impl Workspace {
         Workspace::default()
     }
 
-    pub fn add_project(&mut self, project: Project) {
-        if !self.is_project_in_workspace(&project) {
-            self.projects.push(project);
-        }
+    pub fn add_project(&mut self, project: Project) -> () {
+        self.projects.push(project);
     }
 
-    pub fn select_project(&mut self, project: &Project) -> Result<(), WorkspaceError> {
-        if self.is_project_in_workspace(project) {
-            self.project_id = Some(project.id().to_owned());
-            self.collection_id = Some(project.root_collection().id().to_owned());
+    pub fn select_project(&mut self, project_id: &str) -> Result<(), WorkspaceError> {
+        let project = self.find_project(project_id);
 
-            return Ok(());
+        match project {
+            Some(project) => {
+                let project_id = project.id().to_owned();
+                let collection_id = project.root_collection().id().to_owned();
+
+                self.project_id = Some(project_id);
+                self.collection_id = Some(collection_id);
+
+                return Ok(());
+            }
+            None => {}
         }
+
         Err(WorkspaceError::ProjectNotFound)
     }
 
@@ -52,6 +61,10 @@ impl Workspace {
             .find(|p| Some(p.id()) == self.project_id.as_deref())
     }
 
+    pub fn projects(&self) -> &Vec<Project> {
+        &self.projects
+    }
+
     pub fn collection(&self) -> Option<&Collection> {
         match self.project() {
             Some(project) => Some(project.root_collection()),
@@ -61,5 +74,9 @@ impl Workspace {
 
     fn is_project_in_workspace(&self, project: &Project) -> bool {
         self.projects.iter().any(|p| p.id() == project.id())
+    }
+
+    fn find_project(&self, project_id: &str) -> Option<&Project> {
+        self.projects.iter().find(|p| p.id() == project_id)
     }
 }

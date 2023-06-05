@@ -1,5 +1,4 @@
 use std::{
-    error::Error,
     fs::{self, File},
     io::{Result as IoResult, Write},
 };
@@ -22,7 +21,7 @@ impl StorableProjects for FileStorage {
         }
     }
 
-    fn save_projects(&self, project: Vec<Project>) -> () {
+    fn save_projects(&self, project: &Vec<Project>) -> () {
         let json = self.to_json_projects(project);
 
         self.save_json_to_file(PROJECTS_FILE_NAME, &json).ok();
@@ -37,7 +36,7 @@ impl StorableWorkspace for FileStorage {
         }
     }
 
-    fn save_workspace(&self, workspace: Workspace) -> () {
+    fn save_workspace(&self, workspace: &Workspace) -> () {
         let json = self.to_json_workspace(workspace);
 
         self.save_json_to_file(&WORKSPACE_FILE_NAME, &json).ok();
@@ -45,15 +44,15 @@ impl StorableWorkspace for FileStorage {
 }
 
 impl FileStorage {
-    fn to_json_projects(&self, projects: Vec<Project>) -> String {
-        match serde_json::to_string(&projects) {
+    fn to_json_projects(&self, projects: &Vec<Project>) -> String {
+        match serde_json::to_string(projects) {
             Ok(v) => v,
             Err(_err) => panic!(),
         }
     }
 
-    fn to_json_workspace(&self, workspace: Workspace) -> String {
-        match serde_json::to_string(&workspace) {
+    fn to_json_workspace(&self, workspace: &Workspace) -> String {
+        match serde_json::to_string(workspace) {
             Ok(v) => v,
             Err(_err) => panic!(),
         }
