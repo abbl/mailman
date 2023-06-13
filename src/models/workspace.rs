@@ -9,7 +9,7 @@ pub struct Workspace {
     project_id: Option<String>,
     collection_id: Option<String>,
 
-    #[serde(skip_serializing)]
+    #[serde(skip_serializing, skip_deserializing)]
     projects: Vec<Project>,
 }
 
@@ -28,8 +28,19 @@ impl Workspace {
         Workspace::default()
     }
 
-    pub fn add_project(&mut self, project: Project) -> () {
+    pub fn add_project(mut self, project: Project) -> Workspace {
         self.projects.push(project);
+
+        self
+    }
+
+    pub fn add_default_project(mut self, project: Project) -> Workspace {
+        let project_id = &project.id().to_owned();
+
+        self.projects.push(project);
+        self.select_project(project_id).unwrap();
+
+        self
     }
 
     pub fn select_project(&mut self, project_id: &str) -> Result<(), WorkspaceError> {

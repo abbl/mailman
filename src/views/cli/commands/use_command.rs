@@ -7,9 +7,7 @@ use crate::{
     },
 };
 
-pub struct UseCommand {
-    processable_command: ProcessableCommand,
-}
+pub struct UseCommand {}
 
 impl CommandHandler for UseCommand {
     fn handle_command(&self, arguments_map: HashMap<String, String>, workspace: Workspace) -> () {
@@ -24,18 +22,15 @@ impl CommandHandler for UseCommand {
         todo!()
     }
 
-    fn processable_command(&self) -> &ProcessableCommand {
-        &self.processable_command
+    fn processable_command(&self) -> ProcessableCommand {
+        Command::new("use")
+            .add_subcommand(Command::new("collection_name").expect_value())
+            .to_processable_command()
     }
 }
 
 impl UseCommand {
     pub fn new() -> UseCommand {
-        let command =
-            Command::new("use").add_subcommand(Command::new("collection_name").expect_value());
-
-        UseCommand {
-            processable_command: command.to_processable_command(),
-        }
+        UseCommand {}
     }
 }

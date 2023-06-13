@@ -8,5 +8,5 @@ pub type ArgumentsMap = HashMap<String, String>;
 
 pub trait CommandHandler {
     fn handle_command(&self, arguments_map: HashMap<String, String>, workspace: Workspace);
-    fn processable_command(&self) -> &ProcessableCommand;
+    fn processable_command(&self) -> ProcessableCommand;
 }

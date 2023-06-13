@@ -7,12 +7,8 @@ pub struct CliInputSchema {
     prefix: String,
 }
 
-pub enum CliInputResult {
-    String(String),
-}
-
 impl CliInput {
-    pub fn read(schema: CliInputSchema) -> CliInputResult {
+    pub fn read_string(schema: CliInputSchema) -> String {
         let mut input = String::new();
 
         Self::print_prompt_description(&schema);
@@ -20,7 +16,7 @@ impl CliInput {
 
         io::stdin().read_line(&mut input).unwrap();
 
-        CliInputResult::String(input)
+        input
     }
 
     fn print_prompt_prefix(schema: &CliInputSchema) {
