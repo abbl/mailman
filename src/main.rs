@@ -12,7 +12,13 @@ mod views;
 
 use std::{env, rc::Rc};
 
-use views::cli::{cli_view::CliView, commands::create_workspace_command::CreateWorkspaceCommand};
+use views::cli::{
+    cli_view::CliView,
+    commands::{
+        create_workspace_command::CreateWorkspaceCommand, project_command::ProjectCommand,
+        projects_command::ProjectsCommand,
+    },
+};
 
 use crate::{
     parsers::command::command_parser::CommandParser,
@@ -36,14 +42,19 @@ fn main() {
         storable_workspace.clone(),
     ));
 
-    if args.len() > 1 {
+    if args.len() >= 1 {
         let use_command = UseCommand::new();
         let cli_input = Rc::new(CliInput {});
         let create_workspace_command =
             CreateWorkspaceCommand::new(cli_input, workspace_service.clone());
+        let list_projects_command = ProjectsCommand::new(workspace_service.clone());
+        let project_command = ProjectCommand::new(workspace_service.clone());
+
         let command_parser = CommandParser::new(vec![
             Box::new(use_command),
             Box::new(create_workspace_command),
+            Box::new(list_projects_command),
+            Box::new(project_command),
         ]);
 
         CliView::new(Rc::new(command_parser)).process_arguments(args);
