@@ -83,6 +83,10 @@ impl Workspace {
         }
     }
 
+    pub fn has_projects(&self) -> bool {
+        self.projects.len() > 0
+    }
+
     fn is_project_in_workspace(&self, project: &Project) -> bool {
         self.projects.iter().any(|p| p.id() == project.id())
     }

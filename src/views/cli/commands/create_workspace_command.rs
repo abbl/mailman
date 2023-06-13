@@ -1,7 +1,7 @@
 use std::{collections::HashMap, rc::Rc};
 
 use crate::{
-    models::{project::Project, workspace::Workspace},
+    models::project::Project,
     parsers::command::{
         command::Command, command_handler::CommandHandler, processable_command::ProcessableCommand,
     },
@@ -15,15 +15,20 @@ pub struct CreateWorkspaceCommand {
 }
 
 impl CommandHandler for CreateWorkspaceCommand {
-    fn handle_command(&self, arguments_map: HashMap<String, String>, workspace: Workspace) -> () {
+    fn handle_command(&self, arguments_map: HashMap<String, String>) -> () {
         let project_name =
             CliInput::read_string(CliInputSchema::new().add_description("Insert project name:"));
 
-        self.workspace_service.save_workspace(
-            self.workspace_service
-                .load_workspace()
-                .add_default_project(Project::new(&project_name)),
-        );
+        let mut workspace = self.workspace_service.load_workspace();
+        let project = Project::new(&project_name);
+
+        if workspace.has_projects() {
+            workspace = workspace.add_project(project);
+        } else {
+            workspace = workspace.add_default_project(project);
+        }
+
+        self.workspace_service.save_workspace(workspace);
     }
 
     fn processable_command(&self) -> ProcessableCommand {

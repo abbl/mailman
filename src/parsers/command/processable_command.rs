@@ -4,6 +4,7 @@ use super::{command::Command, command_type::CommandType};
 
 type CommandsArgumentsMap = HashMap<String, String>;
 
+#[derive(Debug)]
 pub struct ProcessableCommand {
     name: String,
     comment: String,

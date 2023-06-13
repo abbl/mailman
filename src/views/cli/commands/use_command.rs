@@ -1,16 +1,13 @@
 use std::{collections::HashMap, io};
 
-use crate::{
-    models::workspace::Workspace,
-    parsers::command::{
-        command::Command, command_handler::CommandHandler, processable_command::ProcessableCommand,
-    },
+use crate::parsers::command::{
+    command::Command, command_handler::CommandHandler, processable_command::ProcessableCommand,
 };
 
 pub struct UseCommand {}
 
 impl CommandHandler for UseCommand {
-    fn handle_command(&self, arguments_map: HashMap<String, String>, workspace: Workspace) -> () {
+    fn handle_command(&self, arguments_map: HashMap<String, String>) -> () {
         println!("Select the project id:");
 
         let mut input_string = String::new();
