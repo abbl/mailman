@@ -10,7 +10,7 @@ use crate::{
 
 pub struct FileStorage {}
 
-const PROJECTS_FILE_NAME: &str = "collections.json";
+const PROJECTS_FILE_NAME: &str = "projects.json";
 const WORKSPACE_FILE_NAME: &str = "workspace.json";
 
 impl StorableProjects for FileStorage {
