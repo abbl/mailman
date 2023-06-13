@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{collection::Collection, request::Request};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum ProjectNode {
     Request(Request),
     Collection(Collection),

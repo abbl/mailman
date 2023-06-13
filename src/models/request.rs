@@ -10,7 +10,7 @@ use crate::{
 
 use super::header::Header;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Request {
     id: String,
     name: String,

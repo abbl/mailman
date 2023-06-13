@@ -12,7 +12,7 @@ use super::{
     project_node::{IdentifiableProjectNode, ProjectNode},
 };
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Project {
     id: String,
     name: String,
@@ -62,8 +62,6 @@ impl Project {
             ProjectNode::Request(_) => panic!(),
         }
     }
-
-    // pub fn find_collection() -> &Collection {}
 
     pub fn add_to_collection(
         &mut self,

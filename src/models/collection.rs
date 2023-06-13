@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use super::request::Request;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Collection {
     id: String,
     name: String,
