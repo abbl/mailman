@@ -9,12 +9,12 @@ use crate::{
     views::cli::cli_input::{CliInput, CliInputSchema},
 };
 
-pub struct CreateWorkspaceCommand {
+pub struct CreateProjectCommand {
     workspace_service: Rc<WorkspaceService>,
     cli_input: Rc<CliInput>,
 }
 
-impl CommandHandler for CreateWorkspaceCommand {
+impl CommandHandler for CreateProjectCommand {
     fn handle_command(&self, arguments_map: HashMap<String, String>) -> () {
         let project_name =
             CliInput::read_string(CliInputSchema::new().add_description("Insert project name:"));
@@ -33,17 +33,17 @@ impl CommandHandler for CreateWorkspaceCommand {
 
     fn processable_command(&self) -> ProcessableCommand {
         Command::new("create")
-            .add_subcommand(Command::new("workspace"))
+            .add_subcommand(Command::new("project"))
             .to_processable_command()
     }
 }
 
-impl CreateWorkspaceCommand {
+impl CreateProjectCommand {
     pub fn new(
         cli_input: Rc<CliInput>,
         workspace_service: Rc<WorkspaceService>,
-    ) -> CreateWorkspaceCommand {
-        CreateWorkspaceCommand {
+    ) -> CreateProjectCommand {
+        CreateProjectCommand {
             workspace_service,
             cli_input,
         }

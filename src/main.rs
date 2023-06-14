@@ -15,7 +15,7 @@ use std::{env, rc::Rc};
 use views::cli::{
     cli_view::CliView,
     commands::{
-        create_workspace_command::CreateWorkspaceCommand, project_command::ProjectCommand,
+        create_project_command::CreateProjectCommand, project_command::ProjectCommand,
         projects_command::ProjectsCommand,
     },
 };
@@ -43,18 +43,16 @@ fn main() {
     ));
 
     if args.len() >= 1 {
-        let use_command = UseCommand::new();
         let cli_input = Rc::new(CliInput {});
-        let create_workspace_command =
-            CreateWorkspaceCommand::new(cli_input, workspace_service.clone());
-        let list_projects_command = ProjectsCommand::new(workspace_service.clone());
-        let project_command = ProjectCommand::new(workspace_service.clone());
 
         let command_parser = CommandParser::new(vec![
-            Box::new(use_command),
-            Box::new(create_workspace_command),
-            Box::new(list_projects_command),
-            Box::new(project_command),
+            Box::new(UseCommand::new()),
+            Box::new(CreateProjectCommand::new(
+                cli_input,
+                workspace_service.clone(),
+            )),
+            Box::new(ProjectsCommand::new(workspace_service.clone())),
+            Box::new(ProjectCommand::new(workspace_service.clone())),
         ]);
 
         CliView::new(Rc::new(command_parser)).process_arguments(args);
